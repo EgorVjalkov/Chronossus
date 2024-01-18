@@ -4,10 +4,5 @@ class Action:
         self.autoleap = autoleap
 
     @property
-    def action_character(self):
-        if self.a_name[-1] == 's':
-            return 'simple'
-        else:
-            return 'feedback'
-
-    def
+    def need_feedback(self):
+        return self.a_name[-1] != 's'
