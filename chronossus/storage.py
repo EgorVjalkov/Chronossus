@@ -1,6 +1,8 @@
 from random import randint, choice
 
 
+
+
 class TokenStorage:
     def __init__(self,
                  storage_name: str,
@@ -12,87 +14,85 @@ class TokenStorage:
 
         self.token_name = storage_name
         self.default_tokens_num = default_token_num
-        self.limit = limit
+        self.limit = list(range(*limit))
         self.die = die
         self.if_limit = if_limit
 
         self.tokens = default_tokens
-        self.token_pool = []
 
     def __repr__(self):
-        if self.token_pool:
-            return f'TokenStorage "{self.token_name}": {self.token_pool}'
-        else:
-            return f'TokenStorage "{self.token_name}": {self.tokens}'
+        return f'TokenStorage "{self.token_name}": {self.tokens}'
 
     @property
     def token_num(self):
-        if self.token_pool:
-            return len(self.token_pool)
+        if isinstance(self.tokens, list):
+            return len(self.tokens)
         else:
             return self.tokens
 
-    def is_overage(self, result):
-        token_num = list(range(*self.limit))
-        return result not in token_num
-
     def get_token_pool(self) -> list:
+        token_pool = []
         for token_type in self.tokens:
-            self.token_pool += [token_type] * self.tokens[token_type]
-        return self.token_pool
+            token_pool += [token_type] * self.tokens[token_type]
+        self.tokens = token_pool
+        return self.tokens
+
+    def limit_decorator(self):
+        def decorator(func):
+            def wrapper(*args, **kwargs):
+                result = func(*args, **kwargs)
+                if self.token_num+result not in self.limit:
+                    return self.if_limit
+                else:
+                    return result
+            return wrapper
+        return decorator
+
+    def try_change_token_num(self, num):
+        @self.limit_decorator()
+        def change(n) -> int | str:
+            sum_ = self.token_num + n
+            print(f'{self.tokens} + {n} -> {sum_}')
+            return n
+        return change(num)
+
+    def add_tokens_by_die(self, rolls: int = 1):
+        for i in range(rolls):
+            add_tokens = choice(self.die)
+            print(add_tokens)
+            result = self.try_change_token_num(add_tokens)
+            if result == self.if_limit:
+                return result
+            else:
+                self.tokens += result
+        return self.tokens
+
+    def change_tokens_by_num(self,
+                             token_num: int,
+                             token_list: list = None):
+
+        n = 1 if token_num > 0 else -1
+
+        for i in range(abs(token_num)):
+            print(i)
+            result = self.try_change_token_num(n)
+            if result == self.if_limit:
+                return result
+            else:
+                if token_list:
+                    self.tokens.append(token_list[i])
+                else:
+                    self.tokens += n
+
+        return self.tokens
 
     def draw_from_pool(self, tokens: int) -> list:
         drawn = []
         for num in range(tokens):
-            last_token_index = len(self.token_pool) - 1
-            token = self.token_pool.pop(randint(0, last_token_index))
+            last_token_index = len(self.tokens) - 1
+            token = self.tokens.pop(randint(0, last_token_index))
             drawn.append(token)
         return drawn
-
-    def add_tokens_by_die(self,
-                          rolls: int = 1) -> int | str:
-        for num in range(rolls):
-            add_tokens = choice(self.die)
-            print(add_tokens)
-            if self.is_overage(self.token_num+add_tokens):
-                return self.if_limit
-            else:
-                self.tokens += add_tokens
-        return self.tokens
-
-    def add_tokens_by_num(self,
-                          token_num: int,
-                          token_list: list = None):
-
-        for token in range(token_num):
-            if self.is_overage(self.token_num+1):
-                return self.if_limit
-            else:
-                if token_list:
-                    self.token_pool.append(token_list.pop(token_list.index(token)))
-                else:
-                    self.tokens += 1
-        return self
-
-    def add_(self,
-             mod: str = 'simple',
-             token_num: int = None,
-             token_list: list = None,
-             rolls: int = None) -> object:
-
-        if mod == 'by_die':
-            return self.add_tokens_by_die(rolls)
-        else:
-            return self.add_tokens_by_num(token_num, token_list)
-
-    def spend_(self, tokens: int | list):
-        if self.token_pool:
-            for token in tokens:
-                self.token_pool.remove(token)
-            return self.token_pool
-        else:
-            self.tokens -= tokens
-            return self.tokens
 
 
 ts = TokenStorage('EnergyPool',
@@ -102,13 +102,12 @@ ts = TokenStorage('EnergyPool',
                   if_limit='stop')
 ts.get_token_pool()
 print(ts)
-# автоматизируй работу с жетонами. сделай функции спенд и адд в одной, возиожно так можно.
-# нужно сделать токенс универвльной переменной чтоб не париться с токенс пулом
-#drawn_t = ts.draw_from_pool(tokens=3)
-#print(drawn_t)
-#print(ts)
-#ts.add_(tokens=['ex'])
-#print(ts)
+
+for i in range(5):
+    drawn_t = ts.draw_from_pool(tokens=3) # <- здесь нужен точно такой же счетчик
+    print(drawn_t)
+    ts.change_tokens_by_num(token_num=1, token_list=['ex'])
+    print(ts)
 #
 #vp = TokenStorage('VPs', 0)
 #print(vp)
@@ -117,16 +116,22 @@ print(ts)
 #vp.spend_(2)
 #print(vp)
 
-paradox = TokenStorage('ParadoxStorage',
-                       0,
-                       0,
-                       limit=[0, 3],
-                       if_limit='anomaly',
-                       die=[0, 1, 1, 1, 1, 2])
-print(paradox)
-overage = paradox.add_(token_num=3)
+#paradox = TokenStorage('ParadoxStorage',
+#                       0,
+#                       0,
+#                       limit=[0, 3],
+#                       if_limit='anomaly',
+#                       die=[0, 1, 1, 1, 1, 2])
+#print(paradox)
+#a = paradox.add_tokens_by_die(rolls=3)
+#print(a)
+#if a == paradox.if_limit:
+#    print('limit')
+#    b = paradox.change_tokens_by_num(-paradox.tokens)
+#    print(b)
+#print(paradox)
+
+
 #overage = paradox.add_(mod='by_die', rolls=3)
-print(paradox)
-print(overage)
 #paradox.spend_(1)
 #print(paradox)
