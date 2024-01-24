@@ -56,16 +56,20 @@ class TokenStorage:
             return n
         return change(num)
 
-    def add_tokens_by_die(self, rolls: int = 1):
-        for i in range(rolls):
+    def change_tokens_by_(self, rolls: int = 0, draws: int = 0):
+        for roll in range(rolls):
             add_tokens = choice(self.die)
             print(add_tokens)
-            result = self.try_change_token_num(add_tokens)
-            if result == self.if_limit:
-                return result
-            else:
-                self.tokens += result
+            self.change_tokens_by_num(add_tokens)
         return self.tokens
+    # попытка все запихнуть в рнд функцию
+
+    def remove_token_from_list(self, token):
+        if token in self.tokens:
+            self.tokens.remove(token)
+        else:
+            print('No token!')
+        return self
 
     def change_tokens_by_num(self,
                              token_num: int,
@@ -74,13 +78,16 @@ class TokenStorage:
         n = 1 if token_num > 0 else -1
 
         for i in range(abs(token_num)):
-            print(i)
             result = self.try_change_token_num(n)
             if result == self.if_limit:
-                return result
+                print(f'Превышет лимит, происходит {self.if_limit}')
+                return self.tokens
             else:
                 if token_list:
-                    self.tokens.append(token_list[i])
+                    if token_num > 0:
+                        self.tokens.append(token_list[i])
+                    else:
+                        self.remove_token_from_list(token_list[i])
                 else:
                     self.tokens += n
 
@@ -89,9 +96,12 @@ class TokenStorage:
     def draw_from_pool(self, tokens: int) -> list:
         drawn = []
         for num in range(tokens):
-            last_token_index = len(self.tokens) - 1
-            token = self.tokens.pop(randint(0, last_token_index))
+            token = choice(self.tokens)
             drawn.append(token)
+            result = self.c
+            if result == self.if_limit:
+                return result
+
         return drawn
 
 
@@ -106,7 +116,7 @@ print(ts)
 for i in range(5):
     drawn_t = ts.draw_from_pool(tokens=3) # <- здесь нужен точно такой же счетчик
     print(drawn_t)
-    ts.change_tokens_by_num(token_num=1, token_list=['ex'])
+    ts.change_tokens_by_num(token_num=-1, token_list=['ex'])
     print(ts)
 #
 #vp = TokenStorage('VPs', 0)
