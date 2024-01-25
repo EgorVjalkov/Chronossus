@@ -1,6 +1,5 @@
 from random import randint, choice
-
-
+from collections import namedtuple
 
 
 class TokenStorage:
@@ -18,7 +17,7 @@ class TokenStorage:
         self.die = die
         self.if_limit = if_limit
 
-        self.tokens = default_tokens
+        self.tokens: int | list | dict = default_tokens
 
     def __repr__(self):
         return f'TokenStorage "{self.token_name}": {self.tokens}'
@@ -56,11 +55,18 @@ class TokenStorage:
             return n
         return change(num)
 
-    def change_tokens_by_(self, rolls: int = 0, draws: int = 0):
-        for roll in range(rolls):
-            add_tokens = choice(self.die)
-            print(add_tokens)
-            self.change_tokens_by_num(add_tokens)
+    def change_tokens_by_(self,
+                          mod: str,
+                          action: tuple):
+        type_act, act_count = action
+        for a in range(act_count):
+            if mod == 'die':
+                new_token: str = f'{type_act}{choice(self.die)}'
+                self.change_tokens_by_num(int(new_token))
+            else:
+                new_token = choice(self.tokens)
+                token_num = f'{type_act}1'
+                self.change_tokens_by_num(int(token_num), token_list=[new_token])
         return self.tokens
     # попытка все запихнуть в рнд функцию
 
@@ -69,7 +75,11 @@ class TokenStorage:
             self.tokens.remove(token)
         else:
             print('No token!')
-        return self
+        return self.tokens
+
+    def not_overage(self, tokens_):
+        sum_ = self.token_num + tokens_
+        return sum_ in self.limit
 
     def change_tokens_by_num(self,
                              token_num: int,
@@ -77,31 +87,29 @@ class TokenStorage:
 
         n = 1 if token_num > 0 else -1
 
-        for i in range(abs(token_num)):
-            result = self.try_change_token_num(n)
-            if result == self.if_limit:
-                print(f'Превышет лимит, происходит {self.if_limit}')
-                return self.tokens
-            else:
+        for att in range(abs(token_num)):
+            if self.not_overage(n):
                 if token_list:
                     if token_num > 0:
-                        self.tokens.append(token_list[i])
+                        self.tokens.append(token_list[att])
                     else:
-                        self.remove_token_from_list(token_list[i])
+                        self.remove_token_from_list(token_list[att])
                 else:
                     self.tokens += n
-
+            else:
+                print(f'overage: {self.if_limit}')
+                return self.if_limit
         return self.tokens
 
     def draw_from_pool(self, tokens: int) -> list:
         drawn = []
         for num in range(tokens):
             token = choice(self.tokens)
-            drawn.append(token)
-            result = self.c
-            if result == self.if_limit:
-                return result
-
+            result = self.change_tokens_by_num(-1, [token])
+            if result is self.limit:
+                return drawn
+            else:
+                drawn.append(token)
         return drawn
 
 
@@ -116,7 +124,7 @@ print(ts)
 for i in range(5):
     drawn_t = ts.draw_from_pool(tokens=3) # <- здесь нужен точно такой же счетчик
     print(drawn_t)
-    ts.change_tokens_by_num(token_num=-1, token_list=['ex'])
+    ts.change_tokens_by_num(token_num=+1, token_list=['ex'])
     print(ts)
 #
 #vp = TokenStorage('VPs', 0)
