@@ -55,21 +55,6 @@ class TokenStorage:
             return n
         return change(num)
 
-    def change_tokens_by_(self,
-                          mod: str,
-                          action: tuple):
-        type_act, act_count = action
-        for a in range(act_count):
-            if mod == 'die':
-                new_token: str = f'{type_act}{choice(self.die)}'
-                self.change_tokens_by_num(int(new_token))
-            else:
-                new_token = choice(self.tokens)
-                token_num = f'{type_act}1'
-                self.change_tokens_by_num(int(token_num), token_list=[new_token])
-        return self.tokens
-    # попытка все запихнуть в рнд функцию
-
     def remove_token_from_list(self, token):
         if token in self.tokens:
             self.tokens.remove(token)
@@ -81,9 +66,9 @@ class TokenStorage:
         sum_ = self.token_num + tokens_
         return sum_ in self.limit
 
-    def change_tokens_by_num(self,
-                             token_num: int,
-                             token_list: list = None):
+    def change_tokens_manually(self,
+                               token_num: int,
+                               token_list: list = None):
 
         n = 1 if token_num > 0 else -1
 
@@ -101,15 +86,24 @@ class TokenStorage:
                 return self.if_limit
         return self.tokens
 
-    def draw_from_pool(self, tokens: int) -> list:
+    def add_tokens_by_die(self,
+                          rolls: int) -> list:
+        for r in range(rolls):
+            token_num = choice(self.die)
+            self.change_tokens_manually(token_num)
+        return self.tokens
+
+    def draw_tokens_from_pool(self,
+                              draws: int) -> list:
         drawn = []
-        for num in range(tokens):
-            token = choice(self.tokens)
-            result = self.change_tokens_by_num(-1, [token])
-            if result is self.limit:
-                return drawn
-            else:
-                drawn.append(token)
+        for num in range(draws):
+            if self.tokens:
+                token = choice(self.tokens)
+                result = self.change_tokens_manually(-1, [token])
+                if result is self.limit:
+                    return drawn
+                else:
+                    drawn.append(token)
         return drawn
 
 
@@ -121,10 +115,10 @@ ts = TokenStorage('EnergyPool',
 ts.get_token_pool()
 print(ts)
 
-for i in range(5):
-    drawn_t = ts.draw_from_pool(tokens=3) # <- здесь нужен точно такой же счетчик
+for i in range(10):
+    drawn_t = ts.draw_tokens_from_pool(draws=3) # <- здесь нужен точно такой же счетчик
     print(drawn_t)
-    ts.change_tokens_by_num(token_num=+1, token_list=['ex'])
+    ts.change_tokens_manually(token_num=+1, token_list=['ex'])
     print(ts)
 #
 #vp = TokenStorage('VPs', 0)
