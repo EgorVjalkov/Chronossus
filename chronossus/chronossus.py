@@ -1,6 +1,7 @@
 import pandas as pd
 from consts_and_funcs import path_to_project, load_frame_from_file
 from random import shuffle
+from chronology import Chronology
 
 
 pd.set_option('display.max.columns', None)
@@ -16,8 +17,9 @@ class CronossusBoard:
         self.language = language
 
         self.board_frame = None
+        self.chronology_deck = Chronology
 
-    def get_action_tiles(self) -> dict:
+    def get_action_tiles(self) -> pd.DataFrame:
         tiles_frame = load_frame_from_file(
             'action_tiles',
             path_to_project)
@@ -27,6 +29,7 @@ class CronossusBoard:
         if self.difficulty in ['easy', 'medium']:
             f_by_name = f_by_edition['name'].map(lambda i: '.A' in i)
             tiles = f_by_edition[f_by_name == True]
+
             if self.difficulty == 'medium':
                 rnd_index = tiles.index.to_list()
                 shuffle(rnd_index)
@@ -35,13 +38,13 @@ class CronossusBoard:
             tiles = pd.DataFrame()
         return tiles
 
-    def init_board(self):
+    def init_action_board(self):
         self.board_frame = load_frame_from_file(
             'action_board',
             path_to_project,
             index_col=0)
 
-        action_tiles = self.get_action_tiles()
+        action_tiles: pd.DataFrame = self.get_action_tiles()
         action_tiles.index = ['I', 'II', 'III']
 
         for place in action_tiles.index:
@@ -49,8 +52,24 @@ class CronossusBoard:
                 place,
                 action_tiles.at[place, 'name'])
 
-        print(self.board_frame)
+        return self.board_frame
+
+    def init_chronology(self):
+        df = load_frame_from_file(
+            'chronology',
+            path_to_project,
+            index_col=0)
+
+        self.chronology_deck = Chronology(
+            chronology_frame=df,
+            stage_name='era')
+
+        self.chronology_deck.set_stage('1')
+
+        return self.chronology_deck
 
 
-chr_board = CronossusBoard(difficulty='medium')
-chr_board.init_board()
+chron = CronossusBoard(difficulty='medium')
+chron.init_action_board()
+chron.init_chronology()
+
