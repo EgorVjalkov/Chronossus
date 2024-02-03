@@ -64,7 +64,7 @@ class CronossusBoard:
             chronology_frame=df,
             stage_name='era')
 
-        self.chronology_deck.set_stage('1')
+        self.chronology_deck.set_stage(1)
 
         return self.chronology_deck
 
@@ -72,4 +72,9 @@ class CronossusBoard:
 chron = CronossusBoard(difficulty='medium')
 chron.init_action_board()
 chron.init_chronology()
-
+print(chron.chronology_deck.stages)
+chron.chronology_deck.set_stage('next')
+print(chron.chronology_deck.stages)
+print(chron.chronology_deck)
+print(chron.chronology_deck.get_stage_storage(1))
+print(chron.chronology_deck)
