@@ -1,13 +1,16 @@
 import pandas as pd
-from consts_and_funcs import path_to_project, load_frame_from_file
 from random import shuffle
-from chronology import Chronology
+from chronology import Chronology, ActionsPath
+from consts_and_funcs import (path_to_project,
+                              load_frame_from_file,
+                              prepare_action_frame,
+                              save_frame_to_file)
 
 
 pd.set_option('display.max.columns', None)
 
 
-class CronossusBoard:
+class Cronossus:
     def __init__(self,
                  difficulty='easy',
                  game_build='original',
@@ -16,7 +19,7 @@ class CronossusBoard:
         self.game_build = game_build
         self.language = language
 
-        self.board_frame = None
+        self.action_deck = None
         self.chronology_deck = Chronology
 
     def get_action_tiles(self) -> pd.DataFrame:
@@ -38,9 +41,9 @@ class CronossusBoard:
             tiles = pd.DataFrame()
         return tiles
 
-    def init_action_board(self):
-        self.board_frame = load_frame_from_file(
-            'action_board',
+    def place_action_tiles(self):
+        self.action_deck = load_frame_from_file(
+            'action_deck',
             path_to_project,
             index_col=0)
 
@@ -48,33 +51,51 @@ class CronossusBoard:
         action_tiles.index = ['I', 'II', 'III']
 
         for place in action_tiles.index:
-            self.board_frame = self.board_frame.replace(
+            self.action_deck = self.action_deck.replace(
                 place,
                 action_tiles.at[place, 'name'])
 
-        return self.board_frame
+        return self.action_deck
+
+    def init_action_board(self):
+        action_frames = []
+        for marker in self.action_deck.index:
+            action_frame = prepare_action_frame(chron.action_deck, marker)
+            ap = ActionsPath(action_frame, f"({marker})")
+            ap.set_stage(1)
+            print(ap.construct_frame_for_concat())
+            action_frames.append(ap.construct_frame_for_concat())
+        self.action_deck = pd.concat(action_frames, axis=0)
+        return self
 
     def init_chronology(self):
-        df = load_frame_from_file(
+        chronology_frame = load_frame_from_file(
             'chronology',
             path_to_project,
             index_col=0)
 
-        self.chronology_deck = Chronology(
-            chronology_frame=df,
-            stage_name='era')
-
-        self.chronology_deck.set_stage(1)
+        chronology = Chronology(chronology_frame)
+        chronology.set_stage(1)
+        self.chronology_deck = chronology.prapare_for_saving()
 
         return self.chronology_deck
 
+    def save_chronossus_data(self):
+        all_data = {'action_deck': self.action_deck,
+                    'chronology': self.chronology_deck}
+        for sheet_name in all_data:
+            save_frame_to_file(all_data[sheet_name], sheet_name, path_to_project)
 
-chron = CronossusBoard(difficulty='medium')
+
+
+chron = Cronossus(difficulty='medium')
+chron.place_action_tiles()
 chron.init_action_board()
 chron.init_chronology()
-print(chron.chronology_deck.stages)
-chron.chronology_deck.set_stage('next')
-print(chron.chronology_deck.stages)
-print(chron.chronology_deck)
-print(chron.chronology_deck.get_stage_storage(1))
-print(chron.chronology_deck)
+chron.save_chronossus_data()
+
+#ap.set_stage(1)
+#for i in range(6):
+#    print(ap.stages)
+#    print(ap.action)
+#    ap.leap()
