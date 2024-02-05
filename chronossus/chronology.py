@@ -62,7 +62,6 @@ class Chronology:
         return frame_
 
 
-
 class ActionsPath(Chronology):
     def __init__(self,
                  chronology_frame: pd.DataFrame,
