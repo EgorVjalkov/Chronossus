@@ -1,6 +1,6 @@
 import pandas as pd
 from random import shuffle
-from chronology import Chronology, ActionsPath
+from chronossus.classes.chronology import Chronology, ActionsPath
 from consts_and_funcs import (path_to_project,
                               load_frame_from_file,
                               prepare_action_frame,
