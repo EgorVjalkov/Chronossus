@@ -1,23 +1,37 @@
 from chronossus.classes.tokenstorage import TokenStorage
+from chronossus.classes.complex_storage import ComplexStorage
 
 
-paradox = TokenStorage('paradox',
-                       0,
-                       [0, 3],
-                       'anomaly',
-                       die=[0, 1, 1, 1, 1, 2])
+#paradox = TokenStorage('paradox',
+#                       0,
+#                       [0, 3],
+#                       'anomaly',
+#                       die=[0, 1, 1, 1, 1, 2])
+#
+#paradox.change_token_num_by_(die=True, rolls=15)
+#
+#
+#paradox.change_token_num_by_(num=2)
+#print(paradox)
+#paradox.change_token_num_by_(num=-2)
+#print(paradox)
 
 
-print(paradox)
-paradox.change_token_num_by_die(rolls=3)
-print(paradox)
-#ts = TokenStorage('EnergyPool',
-#                  {'ch': 5, 'ex': 5},
-#                  10,
-#                  limit=[0, 20],
-#                  if_limit='stop')
-#ts.get_token_pool()
-#print(ts)
+b = ComplexStorage('Breakthroughs',
+                   {'[]': 0, '/\\': 0, '( )': 0},
+                   [0, 20],
+                   if_limit='stop',
+                   die=['[ ]', '/\\', '( )'])
+
+print(b)
+print(b.token_pool)
+b.change_token_pool_by_(action='add', die_rolls=1)
+print(b)
+b.change_token_pool_by_(token_list=[b.last_token], action='rm')
+print(b)
+
+
+
 #
 #for i in range(10):
 #    drawn_t = ts.draw_tokens_from_pool(draws=3) # <- здесь нужен точно такой же счетчик

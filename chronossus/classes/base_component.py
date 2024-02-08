@@ -1,6 +1,7 @@
 import pandas as pd
 
 
+
 class BaseComponent(object):
 
     @staticmethod
@@ -23,29 +24,34 @@ class BaseComponent(object):
     def __repr__(self):
         return f'{self.marker}: {self.value}'
 
-    def limit_decorator(self):
-        def decorator(func):
+    def is_valid(self, new_value):
+        return new_value in self.valid_values
+
+    def get_value_if_valid(self, num) -> int:
+        if self.is_valid(num):
+            return num
+        else:
+            self.if_limit_func()
+            return self.value
+
+    def if_limit_func(self):
+        print(self.if_limit)
+        raise StopIteration()
+
+    def stop_iteration_decor(self):
+        def decor(func):
             def wrapper(*args, **kwargs):
-                result = func(*args, **kwargs)
-                if result not in self.valid_values:
-                    print(self.if_limit) # <- или здесь функция будет!
+                try:
+                    value = func(*args, **kwargs)
+                except StopIteration:
                     return self.value
-                else:
-                    return result
+
+                self.value = value
+                return self.value
 
             return wrapper
 
-        return decorator
-
-    def try_to_change_value(self, num):
-        @self.limit_decorator()
-        def change(n) -> int:
-            return n
-
-        return change(num)
-
-
-
+        return decor
 
     @property
     def stages(self):

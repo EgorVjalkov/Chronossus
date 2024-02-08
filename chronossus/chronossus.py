@@ -1,6 +1,6 @@
 import pandas as pd
 from random import shuffle
-from chronossus.classes.chronology import Chronology, ActionsPath
+from classes.chronology import Chronology, ActionsPath
 from consts_and_funcs import (path_to_project,
                               load_frame_from_file,
                               prepare_action_frame,
@@ -20,18 +20,33 @@ class Cronossus:
         self.language = language
 
         self.action_deck = None
-        self.chronology_deck = Chronology
+        self.chronology_deck = None
+        self.objectives = None
 
-    def get_action_tiles(self) -> pd.DataFrame:
-        tiles_frame = load_frame_from_file(
-            'action_tiles',
+    def load_sheet_and_filter_by_game_build(self,
+                                            sheet_name: str) -> pd.DataFrame:
+        sheet = load_frame_from_file(
+            sheet_name,
             path_to_project)
 
-        f_by_edition = tiles_frame[tiles_frame.game_build == self.game_build]
+        f_by_edition = sheet[sheet.game_build == self.game_build]
+        return f_by_edition
+
+    def init_objectives(self):
+        obj_frame = self.load_sheet_and_filter_by_game_build('objectives')
+        rnd_index = obj_frame.index.to_list()
+        shuffle(rnd_index)
+        obj_frame.index = rnd_index
+        self.objectives = obj_frame.sort_index().head(3).set_index('name')
+        del self.objectives['game_build']
+        return self.objectives
+
+    def get_action_tiles(self) -> pd.DataFrame:
+        tiles_frame = self.load_sheet_and_filter_by_game_build('action_tiles')
 
         if self.difficulty in ['easy', 'medium']:
-            f_by_name = f_by_edition['name'].map(lambda i: '.A' in i)
-            tiles = f_by_edition[f_by_name == True]
+            f_by_name = tiles_frame['name'].map(lambda i: '.A' in i)
+            tiles = tiles_frame[f_by_name == True]
 
             if self.difficulty == 'medium':
                 rnd_index = tiles.index.to_list()
@@ -81,14 +96,15 @@ class Cronossus:
         return self.chronology_deck
 
     def save_chronossus_data(self):
-        all_data = {'action_deck': self.action_deck,
+        all_data = {'objectives': self.objectives,
+                    'action_deck': self.action_deck,
                     'chronology': self.chronology_deck}
         for sheet_name in all_data:
             save_frame_to_file(all_data[sheet_name], sheet_name, path_to_project)
 
 
-
 chron = Cronossus(difficulty='medium')
+chron.init_objectives()
 chron.place_action_tiles()
 chron.init_action_board()
 chron.init_chronology()
