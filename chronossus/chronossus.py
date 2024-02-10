@@ -1,6 +1,6 @@
 import pandas as pd
 from random import shuffle
-from classes.chronology import Chronology, ActionsPath
+from classes.chronology import Chronology
 from consts_and_funcs import (path_to_project,
                               load_frame_from_file,
                               prepare_action_frame,
@@ -89,15 +89,15 @@ class Cronossus:
             path_to_project,
             index_col=0)
 
-        chronology = Chronology(chronology_frame)
-        chronology.set_stage(1)
-        self.chronology_deck = chronology.prapare_for_saving()
+        chronology = Chronology(chronology_name='chronology',
+                                stages=chronology_frame.columns.to_list())
+        self.chronology_deck = chronology.prapare_for_saving(chronology_frame)
 
         return self.chronology_deck
 
     def save_chronossus_data(self):
         all_data = {'objectives': self.objectives,
-                    'action_deck': self.action_deck,
+                    #'action_deck': self.action_deck,
                     'chronology': self.chronology_deck}
         for sheet_name in all_data:
             save_frame_to_file(all_data[sheet_name], sheet_name, path_to_project)
@@ -106,7 +106,7 @@ class Cronossus:
 chron = Cronossus(difficulty='medium')
 chron.init_objectives()
 chron.place_action_tiles()
-chron.init_action_board()
+#chron.init_action_board()
 chron.init_chronology()
 chron.save_chronossus_data()
 

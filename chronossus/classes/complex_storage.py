@@ -39,7 +39,7 @@ class ComplexStorage(BaseComponent):
                     try:
                         return func(*args, **kwargs)
                     except ValueError:
-                        self.if_limit_func()
+                        self._if_overage_func()
 
             return wrapper
 
@@ -47,7 +47,7 @@ class ComplexStorage(BaseComponent):
 
     def _try_to_change_token_pool(self, action, token):
         if action == 'add':
-            new_value = self.get_value_if_valid(self.value + 1)
+            new_value = self._get_value_if_valid(self.value + 1)
 
             @self._change_token_pool_decorator(new_value)
             def append_token(token_name):
@@ -58,7 +58,7 @@ class ComplexStorage(BaseComponent):
             return append_token(token)
 
         else:
-            new_value = self.get_value_if_valid(self.value - 1)
+            new_value = self._get_value_if_valid(self.value - 1)
 
             @self._change_token_pool_decorator(new_value)
             def remove_token(token_name):
@@ -91,7 +91,7 @@ class ComplexStorage(BaseComponent):
             try:
                 token = choice(self.token_pool)
             except IndexError:
-                self.if_limit_func()
+                self._if_overage_func()
             else:
                 self._change_token_pool_from_list('rm', [token])
                 self.drawn.append(token)
