@@ -1,5 +1,4 @@
-from chronossus.classes.tokenstorage import TokenStorage
-from chronossus.classes.complex_storage import ComplexStorage
+from chronossus.complex_storage import ComplexStorage
 
 
 #paradox = TokenStorage('paradox',

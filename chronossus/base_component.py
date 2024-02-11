@@ -1,6 +1,3 @@
-import pandas as pd
-
-
 class BaseComponent(object):
 
     @staticmethod

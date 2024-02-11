@@ -3,11 +3,11 @@ from pathlib import Path
 import pandas as pd
 
 
-path_to_project = Path.cwd()
+path_to_project = Path(os.path.dirname(os.path.abspath(__file__)))
 
 
 def load_frame_from_file(sheet_name, path, index_col=None) -> pd.DataFrame:
-    path = Path(path, 'chronossus_action_board.xlsx')
+    path = Path(path, 'chronossus', 'chronossus_action_board.xlsx')
     return pd.read_excel(path, sheet_name=sheet_name, index_col=index_col)
 
 
@@ -15,7 +15,7 @@ def save_frame_to_file(frame: pd.DataFrame,
                        sheet_name: str,
                        path: Path) -> None:
     file_name = 'chronossus_after_init.xlsx'
-    path_to_file = Path(path, 'chronossus_after_init.xlsx')
+    path_to_file = Path(path, 'chronossus', 'chronossus_after_init.xlsx')
     if file_name in os.listdir(path):
         mode = 'a'
         if_sheet_exist = 'replace'

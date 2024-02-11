@@ -1,5 +1,5 @@
 import pandas as pd
-from chronossus.classes.tokenstorage import TokenStorage
+from tokenstorage import TokenStorage
 
 
 class Chronology(TokenStorage):

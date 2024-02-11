@@ -3,7 +3,9 @@ name = "chronossus"
 version = "0.1.0"
 description = ""
 authors = ["EgorVjalkov <e.vjalkov@yandex.ru>"]
+packages = [{include = "chronossus"}]
 readme = "README.md"
+
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -11,6 +13,7 @@ pandas = "^2.1.4"
 aiogram = "^3.3.0"
 pathlib = "^1.0.1"
 openpyxl = "^3.1.2"
+pyarrow = "^15.0.0"
 
 
 [build-system]

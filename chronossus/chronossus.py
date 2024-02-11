@@ -1,11 +1,10 @@
 import pandas as pd
 from random import shuffle
-from classes.chronology import Chronology
 from consts_and_funcs import (path_to_project,
                               load_frame_from_file,
                               prepare_action_frame,
                               save_frame_to_file)
-
+from chronology import Chronology
 
 pd.set_option('display.max.columns', None)
 

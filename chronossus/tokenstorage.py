@@ -1,5 +1,5 @@
 from random import choice
-from chronossus.classes.base_component import BaseComponent
+from base_component import BaseComponent
 
 
 class TokenStorage(BaseComponent):

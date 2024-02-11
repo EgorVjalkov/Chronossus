@@ -1,5 +1,5 @@
-from random import randint, choice
-from chronossus.classes.base_component import BaseComponent
+from random import choice
+from chronossus.base_component import BaseComponent
 
 
 class ComplexStorage(BaseComponent):
