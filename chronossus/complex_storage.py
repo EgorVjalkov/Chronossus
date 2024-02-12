@@ -47,7 +47,7 @@ class ComplexStorage(BaseComponent):
 
     def _try_to_change_token_pool(self, action, token):
         if action == 'add':
-            new_value = self._get_value_if_valid(self.value + 1)
+            new_value = self._set_value_if_valid(self.value + 1)
 
             @self._change_token_pool_decorator(new_value)
             def append_token(token_name):
@@ -58,7 +58,7 @@ class ComplexStorage(BaseComponent):
             return append_token(token)
 
         else:
-            new_value = self._get_value_if_valid(self.value - 1)
+            new_value = self._set_value_if_valid(self.value - 1)
 
             @self._change_token_pool_decorator(new_value)
             def remove_token(token_name):

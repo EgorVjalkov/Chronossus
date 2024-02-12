@@ -23,7 +23,7 @@ class BaseComponent(object):
     def _is_valid(self, new_value):
         return new_value in self.valid_values
 
-    def _get_value_if_valid(self, num) -> int:
+    def _set_value_if_valid(self, num) -> int:
         if self._is_valid(num):
             return num
         else:
@@ -33,7 +33,7 @@ class BaseComponent(object):
     def _change_value_by_num(self, num: int):
         n = -1 if num < 0 else +1
         for i in range(abs(num)):
-            value = self._get_value_if_valid(self.value + n)
+            value = self._set_value_if_valid(self.value + n)
             self.value = value
         print('store', self.value)
         return self.value

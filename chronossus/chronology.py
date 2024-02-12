@@ -17,61 +17,75 @@ class Chronology(TokenStorage):
 
         self.valid_values = stages
 
+    def __repr__(self):
+        for_print = self.marker_ser.to_dict()
+        for_print = [f'{i}{for_print[i]}' if for_print[i] else f'{i}'
+                     for i in for_print]
+        return ' | '.join(for_print)
+
     @property
-    def stages_ser(self):
+    def marker_ser(self) -> pd.Series:
         ser = pd.Series(index=self.valid_values, dtype=str, name=self.name)
         ser[self.value] = self.marker
         return ser.fillna('')
 
-    def stage_data(self, data_frame):
-        return data_frame[self.value]
+    def go_for_(self, stages=1) -> int:
+        return self.change_value_by_(num=stages)
 
-    def prapare_for_saving(self, data_frame):
-        stages = pd.DataFrame(self.stages_ser.to_dict(),
+    def stage_data(self, pd_data: pd.Series | pd.DataFrame) -> pd.Series | pd.DataFrame:
+        return pd_data[self.value]
+
+    def prapare_for_saving(self, data_frame) -> pd.DataFrame:
+        stages = pd.DataFrame(self.marker_ser.to_dict(),
                               index=[self.marker])
-        print(stages)
         data_frame.columns = self.valid_values
-        print(data_frame)
         frame_ = pd.concat([stages, data_frame], axis=0)
         return frame_
 
 
-chronology_line = Chronology('chronology',
-                             [1, 2, 3, 4, 5, 6, 7])
+#chronology_line = Chronology('chronology',
+#                             [1, 2, 3, 4, 5, 6, 7])
+#
+#chronology_line.go_for_()
+#print(chronology_line)
+
 
 #  нужно подумать как возбуждать лимитирование. через декоратор чтольб?
 
-#    def __repr__(self):
-#        for_print = self.stages.to_dict()
-#        for_print = [f'{i}{for_print[i]}' if for_print[i] else f'{i}'
-#                     for i in for_print]
-#        return ' | '.join(for_print)
 
-#
+class ActionsPath(Chronology):
+    def __init__(self,
+                 path_name: str,
+                 stage_data: pd.Series):
+
+        super().__init__(chronology_name=path_name,
+                         stages=stage_data.index.to_list())
+
+        self.stages_data = stage_data
+
+    def _set_value_if_valid(self, num) -> int:
+        """изменено поведение, лимитирование не происходит"""
+        if self._is_valid(num):
+            return num
+        else:
+            self.value = 1
+            return self.value
+
+    @property
+    def action(self) -> str:
+        return self.stage_data(self.stages_data)
+
+    def prapare_for_saving(self, **kwargs):
+        frame_ = pd.concat([self.marker_ser, self.stages_data], axis=1)
+        return frame_.T
 
 
-#class ActionsPath(Chronology):
-#    def __init__(self,
-#                 chronology_frame: pd.DataFrame,
-#                 token_value: str):
-#        super().__init__(chronology_frame, token_value)
-#
-#    @property
-#    def marker(self) -> int:
-#        return self.frame_.index.to_list()[0]
-#
-#    @property
-#    def action(self) -> str:
-#        return self.stage_data[self.marker]
-#
-#    def leap(self) -> pd.Series:
-#        if self.stage == max(self.limits):
-#            return self.set_stage(1)
-#        else:
-#            return self.set_stage('next')
-#
-#    def construct_frame_for_concat(self):
-#        data_ser = self.frame_.loc[self.marker]
-#        data_ser.index = self.default_stages
-#        frame_ = pd.concat([self.stages, data_ser], axis=1)
-#        return frame_.T
+a = ActionsPath('1',
+                pd.Series({1: 'x', 2: 'y'}))
+
+print(a)
+a.go_for_(3)
+print(a.action)
+print(a.prapare_for_saving())
+
+

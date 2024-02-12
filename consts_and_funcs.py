@@ -13,10 +13,11 @@ def load_frame_from_file(sheet_name, path, index_col=None) -> pd.DataFrame:
 
 def save_frame_to_file(frame: pd.DataFrame,
                        sheet_name: str,
-                       path: Path) -> None:
+                       path: Path = None) -> None:
+    path_to_dir = Path(path_to_project, 'output')
     file_name = 'chronossus_after_init.xlsx'
-    path_to_file = Path(path, 'chronossus', 'chronossus_after_init.xlsx')
-    if file_name in os.listdir(path):
+    path_to_file = Path(path_to_dir, file_name)
+    if file_name in os.listdir(path_to_dir):
         mode = 'a'
         if_sheet_exist = 'replace'
     else:

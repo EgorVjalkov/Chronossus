@@ -4,7 +4,7 @@ from consts_and_funcs import (path_to_project,
                               load_frame_from_file,
                               prepare_action_frame,
                               save_frame_to_file)
-from chronology import Chronology
+from chronology import Chronology, ActionsPath
 
 pd.set_option('display.max.columns', None)
 
@@ -75,10 +75,8 @@ class Cronossus:
         action_frames = []
         for marker in self.action_deck.index:
             action_frame = prepare_action_frame(chron.action_deck, marker)
-            ap = ActionsPath(action_frame, f"({marker})")
-            ap.set_stage(1)
-            print(ap.construct_frame_for_concat())
-            action_frames.append(ap.construct_frame_for_concat())
+            ap = ActionsPath(str(marker), action_frame.loc[marker])
+            action_frames.append(ap.prapare_for_saving())
         self.action_deck = pd.concat(action_frames, axis=0)
         return self
 
@@ -96,16 +94,16 @@ class Cronossus:
 
     def save_chronossus_data(self):
         all_data = {'objectives': self.objectives,
-                    #'action_deck': self.action_deck,
+                    'action_deck': self.action_deck,
                     'chronology': self.chronology_deck}
         for sheet_name in all_data:
-            save_frame_to_file(all_data[sheet_name], sheet_name, path_to_project)
+            save_frame_to_file(all_data[sheet_name], sheet_name)
 
 
 chron = Cronossus(difficulty='medium')
 chron.init_objectives()
 chron.place_action_tiles()
-#chron.init_action_board()
+chron.init_action_board()
 chron.init_chronology()
 chron.save_chronossus_data()
 
