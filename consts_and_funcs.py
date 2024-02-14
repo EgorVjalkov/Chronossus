@@ -6,8 +6,10 @@ import pandas as pd
 path_to_project = Path(os.path.dirname(os.path.abspath(__file__)))
 
 
-def load_frame_from_file(sheet_name, path, index_col=None) -> pd.DataFrame:
-    path = Path(path, 'chronossus', 'chronossus_action_board.xlsx')
+def load_frame_from_file(sheet_name: str,
+                         path: Path = None,
+                         index_col=None) -> pd.DataFrame:
+    path = Path(path_to_project, 'chronossus', 'chronossus_action_board.xlsx')
     return pd.read_excel(path, sheet_name=sheet_name, index_col=index_col)
 
 

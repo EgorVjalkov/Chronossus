@@ -43,25 +43,50 @@ class Chronology(TokenStorage):
         return frame_
 
 
-#chronology_line = Chronology('chronology',
-#                             [1, 2, 3, 4, 5, 6, 7])
-#
+chronology_line = Chronology('chronology',
+                             [1, 2, 3, 4, 5, 6])
+
 #chronology_line.go_for_()
 #print(chronology_line)
 
 
 #  нужно подумать как возбуждать лимитирование. через декоратор чтольб?
 
-
-class ActionsPath(Chronology):
+class TimeTravelTrack(Chronology):
     def __init__(self,
-                 path_name: str,
+                 track_name: str,
                  stage_data: pd.Series):
 
-        super().__init__(chronology_name=path_name,
+        super().__init__(chronology_name=track_name,
                          stages=stage_data.index.to_list())
 
         self.stages_data = stage_data
+
+    @property
+    def data(self) -> str:
+        return self.stage_data(self.stages_data)
+
+    def prapare_for_saving(self, **kwargs):
+        frame_ = pd.concat([self.marker_ser, self.stages_data], axis=1)
+        return frame_.T
+
+
+a = TimeTravelTrack('timetravel',
+                    pd.Series({0: 0, 1: 2}, name='VP'))
+
+print(a)
+a.go_for_(1)
+print(a.data)
+print(a.prapare_for_saving())
+
+
+class ActionsPath(TimeTravelTrack):
+    def __init__(self,
+                 track_name: str,
+                 stage_data: pd.Series):
+
+        super().__init__(track_name,
+                         stage_data)
 
     def _set_value_if_valid(self, num) -> int:
         """изменено поведение, лимитирование не происходит"""
@@ -71,21 +96,13 @@ class ActionsPath(Chronology):
             self.value = 1
             return self.value
 
-    @property
-    def action(self) -> str:
-        return self.stage_data(self.stages_data)
-
-    def prapare_for_saving(self, **kwargs):
-        frame_ = pd.concat([self.marker_ser, self.stages_data], axis=1)
-        return frame_.T
-
 
 a = ActionsPath('1',
-                pd.Series({1: 'x', 2: 'y'}))
+                pd.Series({1: 'x', 2: 'y'}, name='action'))
 
 print(a)
 a.go_for_(3)
-print(a.action)
+print(a.data)
 print(a.prapare_for_saving())
 
 
