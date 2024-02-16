@@ -5,20 +5,19 @@ from base_component import BaseComponent
 class TokenStorage(BaseComponent):
     def __init__(self,
                  storage_name: str,
-                 default_token_num: int,
-                 limit: list = None,
-                 if_limit: str = 'stop',
+                 token_num: int,
+                 limit: int = None,
                  die: list = None):
 
         super().__init__(name=storage_name,
-                         default_value=default_token_num,
-                         limit=limit,
-                         if_limit=if_limit)
+                         value=token_num,
+                         limit=limit)
 
         self.die = die
 
     def _change_value_by_die(self,
                              rolls: int) -> int:
+        print('rolls', rolls)
         for r in range(rolls):
             token_num = choice(self.die)
             print('roll', token_num)
@@ -35,5 +34,5 @@ class TokenStorage(BaseComponent):
             else:
                 self._change_value_by_num(num)
         except StopIteration:
-            return self.value
+            print('stop')
         return self.value

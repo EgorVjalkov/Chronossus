@@ -4,7 +4,7 @@ from consts_and_funcs import (path_to_project,
                               load_frame_from_file,
                               prepare_action_frame,
                               save_frame_to_file)
-from chronology import Chronology, ActionsPath
+from chronology import Chronology, CommandTrack
 
 pd.set_option('display.max.columns', None)
 
@@ -75,7 +75,7 @@ class Cronossus:
         action_frames = []
         for marker in self.action_deck.index:
             action_frame = prepare_action_frame(chron.action_deck, marker)
-            ap = ActionsPath(str(marker), action_frame.loc[marker])
+            ap = CommandTrack(str(marker), action_frame.loc[marker])
             action_frames.append(ap.prapare_for_saving())
         self.action_deck = pd.concat(action_frames, axis=0)
         return self

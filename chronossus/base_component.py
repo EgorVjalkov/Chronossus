@@ -1,21 +1,38 @@
-class BaseComponent(object):
+def gen_value(value: int,
+              num: int,
+              valid_values: list,
+              recursion_flag: bool = False):
+    v = value
+    el = int(num / abs(num))
+    for n in range(abs(num)):
+        v += el
+        if v not in valid_values:
+            if recursion_flag:
+                if el > 0:
+                    yield min(valid_values)
+                else:
+                    yield max(valid_values)
+            else:
+                break
+        else:
+            value = v
+            yield value
 
-    @staticmethod
-    def get_valid_values(limit) -> list:
-        return list(range(*limit))
+
+class BaseComponent(object):
 
     def __init__(self,
                  name: str,
-                 default_value: int = None,
-                 limit: list = None,
-                 if_limit: str = 'stop'):
+                 value: int = None,
+                 limit: int = None):
         self.name = name
-        self.default_value = default_value
-        self.valid_values = self.get_valid_values(limit) if limit else None
-        self.if_limit = if_limit
+        self.min = 0
+        self.max = limit
+        self.valid_values = list(range(self.min, self.max)) if limit else None
 
         self.marker = f'({self.name[0].upper()})'
-        self.value = default_value
+        self.value = value
+        self.recursion: bool = False
 
     def __repr__(self):
         return f'{self.marker}: {self.value}'
@@ -23,22 +40,12 @@ class BaseComponent(object):
     def _is_valid(self, new_value):
         return new_value in self.valid_values
 
-    def _set_value_if_valid(self, num) -> int:
-        if self._is_valid(num):
-            return num
-        else:
-            self._if_overage_func()
-            return self.value
-
-    def _change_value_by_num(self, num: int):
-        n = -1 if num < 0 else +1
-        for i in range(abs(num)):
-            value = self._set_value_if_valid(self.value + n)
-            self.value = value
-        print('store', self.value)
-        return self.value
-
-    def _if_overage_func(self, stop=True):
-        print(self.if_limit)
-        if stop:
-            raise StopIteration()
+    def _change_value_by_num(self,
+                             num: int):
+        if num != 0:
+            value_gen = gen_value(self.value, num, self.valid_values, recursion_flag=self.recursion)
+            print('value', self.value)
+            for i in range(abs(num)):
+                self.value = next(value_gen)
+                print('store', self.value)
+        return self

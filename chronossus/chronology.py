@@ -7,19 +7,15 @@ class Chronology(TokenStorage):
     def __init__(self,
                  chronology_name: str,
                  stages: list,
-                 if_limit: str = 'stop'):
+                 stage: int = 1):
 
-        default_value = stages[0]
-
-        super().__init__(chronology_name,
-                         default_value,
-                         if_limit=if_limit)
+        super().__init__(chronology_name, stage)
 
         self.valid_values = stages
 
     def __repr__(self):
         for_print = self.marker_ser.to_dict()
-        for_print = [f'{i}{for_print[i]}' if for_print[i] else f'{i}'
+        for_print = [f'{for_print[i]}' if for_print[i] else f'{i}'
                      for i in for_print]
         return ' | '.join(for_print)
 
@@ -46,19 +42,16 @@ class Chronology(TokenStorage):
 chronology_line = Chronology('chronology',
                              [1, 2, 3, 4, 5, 6])
 
-#chronology_line.go_for_()
-#print(chronology_line)
 
-
-#  нужно подумать как возбуждать лимитирование. через декоратор чтольб?
-
-class TimeTravelTrack(Chronology):
+class Track(Chronology):
     def __init__(self,
                  track_name: str,
-                 stage_data: pd.Series):
+                 stage_data: pd.Series,
+                 stage: int = 1):
 
         super().__init__(chronology_name=track_name,
-                         stages=stage_data.index.to_list())
+                         stages=stage_data.index.to_list(),
+                         stage=stage)
 
         self.stages_data = stage_data
 
@@ -71,38 +64,14 @@ class TimeTravelTrack(Chronology):
         return frame_.T
 
 
-a = TimeTravelTrack('timetravel',
-                    pd.Series({0: 0, 1: 2}, name='VP'))
-
-print(a)
-a.go_for_(1)
-print(a.data)
-print(a.prapare_for_saving())
-
-
-class ActionsPath(TimeTravelTrack):
+class CommandTrack(Track):
     def __init__(self,
                  track_name: str,
-                 stage_data: pd.Series):
+                 stage_data: pd.Series,
+                 stage: int = 1):
 
         super().__init__(track_name,
-                         stage_data)
+                         stage_data,
+                         stage)
 
-    def _set_value_if_valid(self, num) -> int:
-        """изменено поведение, лимитирование не происходит"""
-        if self._is_valid(num):
-            return num
-        else:
-            self.value = 1
-            return self.value
-
-
-a = ActionsPath('1',
-                pd.Series({1: 'x', 2: 'y'}, name='action'))
-
-print(a)
-a.go_for_(3)
-print(a.data)
-print(a.prapare_for_saving())
-
-
+        self.recursion = True

@@ -2,78 +2,64 @@ from random import choice
 from base_component import BaseComponent
 
 
+#def gen_list(token_pool, elements, valid_valies):
+#    v = len(list)
+#    el = int(rng / abs(rng))
+#    for n in range(abs(rng)):
+#        v += el
+#        if v not in valid_values and el in :
+#                break
+#        else:
+#            if el > 0:
+#                list.append(element)
+#            else:
+#                list.remove(element)
+#            yield list
+
+
 class ComplexStorage(BaseComponent):
 
     @staticmethod
-    def get_token_pool(default_tokens) -> list:
-        token_pool = []
-        for token_type in default_tokens:
-            token_pool += [token_type] * default_tokens[token_type]
-        return token_pool
+    def get_token_pool(tokens) -> list:
+        if isinstance(tokens, dict):
+            token_pool = []
+            for token_type in tokens:
+                token_pool += [token_type] * tokens[token_type]
+            return token_pool
+        else:
+            return tokens
 
     def __init__(self,
                  pool_name: str,
-                 default_tokens: dict,
-                 limit: list,
-                 if_limit: str = 'stop',
+                 tokens: dict | list,
+                 limit: int,
                  die: list = None):
 
         super().__init__(name=pool_name,
-                         default_value=0,
-                         limit=limit,
-                         if_limit=if_limit)
+                         value=0,
+                         limit=limit)
 
-        self.token_pool: list = self.get_token_pool(default_tokens)
+        self.token_pool: list = self.get_token_pool(tokens)
         self.value = len(self.token_pool)
         self.die = die
         self.drawn: list = []
+
+    def __repr__(self):
+        return f"{self.name}: {self.token_pool}"
 
     @property
     def last_token(self):
         return self.token_pool[-1]
 
-    def _change_token_pool_decorator(self, new_value):
-        def decorator(func):
-            def wrapper(*args, **kwargs):
-                if new_value != self.value:
-                    try:
-                        return func(*args, **kwargs)
-                    except ValueError:
-                        self._if_overage_func()
-
-            return wrapper
-
-        return decorator
-
-    def _try_to_change_token_pool(self, action, token):
-        if action == 'add':
-            new_value = self._set_value_if_valid(self.value + 1)
-
-            @self._change_token_pool_decorator(new_value)
-            def append_token(token_name):
-                self.token_pool.append(token_name)
-                self.value = new_value
-                return self.token_pool
-
-            return append_token(token)
-
-        else:
-            new_value = self._set_value_if_valid(self.value - 1)
-
-            @self._change_token_pool_decorator(new_value)
-            def remove_token(token_name):
-                self.token_pool.remove(token_name)
-                self.value = new_value
-                return self.token_pool
-
-            return remove_token(token)
-
     def _change_token_pool_from_list(self,
                                      action: str,
                                      token_list: list) -> list:
-        for token in token_list:
-            self._try_to_change_token_pool(action, token)
-            print('store', self.token_pool)
+        if action == 'add':
+            self.token_pool.extend(token_list)
+        else:
+            for token in token_list:
+                self.token_pool.remove(token)
+        print('store', self.token_pool)
         return self.token_pool
 
     def _change_token_pool_by_die(self,
@@ -91,7 +77,7 @@ class ComplexStorage(BaseComponent):
             try:
                 token = choice(self.token_pool)
             except IndexError:
-                self._if_overage_func()
+                return self.drawn
             else:
                 self._change_token_pool_from_list('rm', [token])
                 self.drawn.append(token)
@@ -110,5 +96,6 @@ class ComplexStorage(BaseComponent):
             else:
                 self._change_token_pool_from_list(action, token_list)
 
-        except StopIteration:
-            return self.token_pool
+        except ValueError:
+            print('stop')
+        return self.token_pool
