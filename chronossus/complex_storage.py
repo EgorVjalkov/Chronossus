@@ -1,5 +1,5 @@
 from random import choice
-from base_component import BaseComponent
+from chronossus.base_component import BaseComponent
 
 
 #def gen_list(token_pool, elements, valid_valies):

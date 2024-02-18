@@ -4,23 +4,29 @@ from consts_and_funcs import (path_to_project,
                               load_frame_from_file,
                               prepare_action_frame,
                               save_frame_to_file)
-from chronology import Chronology, CommandTrack
+from chronossus.chronology import Chronology, CommandTrack
 
 pd.set_option('display.max.columns', None)
 
 
-class Cronossus:
+class Chronossus:
     def __init__(self,
-                 difficulty='easy',
-                 game_build='original',
-                 language='eng'):
+                 base_game: str = 'ORIGINAL',
+                 expansions: str = 'NO EXPANSIONS',
+                 difficulty: str = 'easy',
+                 language: str = 'eng'):
+
+        self.base_game = base_game
+        self.expansions = expansions
         self.difficulty = difficulty
-        self.game_build = game_build
         self.language = language
 
         self.action_deck = None
         self.chronology_deck = None
         self.objectives = None
+
+    def __repr__(self):
+        return f"Chronossus build: {self.base_game}, {self.expansions}, {self.difficulty}"
 
     def load_sheet_and_filter_by_game_build(self,
                                             sheet_name: str) -> pd.DataFrame:
@@ -28,7 +34,7 @@ class Cronossus:
             sheet_name,
             path_to_project)
 
-        f_by_edition = sheet[sheet.game_build == self.game_build]
+        f_by_edition = sheet[sheet.game_build == self.base_game]
         return f_by_edition
 
     def init_objectives(self):
@@ -100,15 +106,16 @@ class Cronossus:
             save_frame_to_file(all_data[sheet_name], sheet_name)
 
 
-chron = Cronossus(difficulty='medium')
-chron.init_objectives()
-chron.place_action_tiles()
-chron.init_action_board()
-chron.init_chronology()
-chron.save_chronossus_data()
+if __name__ == '__main__':
+    chron = Chronossus(difficulty='medium')
+    chron.init_objectives()
+    chron.place_action_tiles()
+    chron.init_action_board()
+    chron.init_chronology()
+    chron.save_chronossus_data()
 
-#ap.set_stage(1)
-#for i in range(6):
-#    print(ap.stages)
-#    print(ap.action)
-#    ap.leap()
+    #ap.set_stage(1)
+    #for i in range(6):
+    #    print(ap.stages)
+    #    print(ap.action)
+    #    ap.leap()
