@@ -5,6 +5,8 @@ from consts_and_funcs import (path_to_project,
                               prepare_action_frame,
                               save_frame_to_file)
 from chronossus.chronology import Chronology, CommandTrack
+from chronossus.action_tile import ActionTile
+
 
 pd.set_option('display.max.columns', None)
 
@@ -21,7 +23,7 @@ class Chronossus:
         self.difficulty = difficulty
         self.language = language
 
-        self.action_deck = None
+        self.action_board = None
         self.chronology_deck = None
         self.objectives = None
 
@@ -62,7 +64,7 @@ class Chronossus:
         return tiles
 
     def place_action_tiles(self):
-        self.action_deck = load_frame_from_file(
+        self.action_board = load_frame_from_file(
             'action_deck',
             path_to_project,
             index_col=0)
@@ -71,19 +73,20 @@ class Chronossus:
         action_tiles.index = ['I', 'II', 'III']
 
         for place in action_tiles.index:
-            self.action_deck = self.action_deck.replace(
+            tile = ActionTile(action_tiles.loc[place])
+            self.action_board = self.action_board.replace(
                 place,
-                action_tiles.at[place, 'name'])
+                tile)
 
-        return self.action_deck
+        return self.action_board
 
     def init_action_board(self):
         action_frames = []
-        for marker in self.action_deck.index:
-            action_frame = prepare_action_frame(chron.action_deck, marker)
+        for marker in self.action_board.index:
+            action_frame = prepare_action_frame(self.action_board, marker)
             ap = CommandTrack(str(marker), action_frame.loc[marker])
             action_frames.append(ap.prapare_for_saving())
-        self.action_deck = pd.concat(action_frames, axis=0)
+        self.action_board = pd.concat(action_frames, axis=0)
         return self
 
     def init_chronology(self):
@@ -100,22 +103,9 @@ class Chronossus:
 
     def save_chronossus_data(self):
         all_data = {'objectives': self.objectives,
-                    'action_deck': self.action_deck,
+                    'action_deck': self.action_board,
                     'chronology': self.chronology_deck}
         for sheet_name in all_data:
             save_frame_to_file(all_data[sheet_name], sheet_name)
 
 
-if __name__ == '__main__':
-    chron = Chronossus(difficulty='medium')
-    chron.init_objectives()
-    chron.place_action_tiles()
-    chron.init_action_board()
-    chron.init_chronology()
-    chron.save_chronossus_data()
-
-    #ap.set_stage(1)
-    #for i in range(6):
-    #    print(ap.stages)
-    #    print(ap.action)
-    #    ap.leap()
