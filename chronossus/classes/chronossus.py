@@ -4,7 +4,7 @@ from consts_and_funcs import (path_to_project,
                               load_frame_from_file,
                               prepare_action_frame,
                               save_frame_to_file)
-from chronossus.chronology import Chronology, CommandTrack
+from chronossus.classes.chronology import Chronology, CommandTrack
 
 pd.set_option('display.max.columns', None)
 

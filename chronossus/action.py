@@ -1,5 +1,5 @@
-from tokenstorage import TokenStorage
-from complex_storage import ComplexStorage
+from chronossus.classes.tokenstorage import TokenStorage
+from chronossus.classes.complex_storage import ComplexStorage
 
 
 # акции бывают разные. с выбором, напирмер

@@ -1,6 +1,4 @@
-from complex_storage import ComplexStorage
-from tokenstorage import TokenStorage
-from chronology import Chronology, Track, CommandTrack
+from chronossus.classes.chronology import CommandTrack
 import pandas as pd
 
 
