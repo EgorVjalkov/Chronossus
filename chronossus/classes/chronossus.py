@@ -4,9 +4,13 @@ from consts_and_funcs import (path_to_project,
                               load_frame_from_file,
                               prepare_action_frame,
                               save_frame_to_file)
+<<<<<<< HEAD:chronossus/chronossus.py
 from chronossus.chronology import Chronology, CommandTrack
 from chronossus.action_tile import ActionTile
 
+=======
+from chronossus.classes.chronology import Chronology, CommandTrack
+>>>>>>> refs/remotes/origin/main:chronossus/classes/chronossus.py
 
 pd.set_option('display.max.columns', None)
 

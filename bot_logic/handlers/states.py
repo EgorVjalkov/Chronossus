@@ -1,11 +1,16 @@
-from aiogram.fsm.state import StatesGroup, State
+from abc import ABC
 
-from bot_logic.handlers.available_variants import states_game_buildings
+import pandas as pd
+from aiogram.fsm.state import StatesGroup, State
+from aiogram.fsm.storage.base import BaseStorage
+from aiogram.fsm.context import FSMContext
+
+from bot_logic.handlers.available_variants import building_menu_vars
 
 
 class BuildGame(StatesGroup):
-    start_choosing = State()
-    in_game = State()
+    building_menu = State()
+    game = State()
 
 
 class ChronossusCommand(StatesGroup):

@@ -1,4 +1,4 @@
-from chronossus.chronossus import Chronossus
+from chronossus.classes.chronossus import Chronossus
 
 chron = Chronossus()
 chron.init_objectives()
