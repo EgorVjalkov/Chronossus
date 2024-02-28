@@ -1,4 +1,4 @@
-building_menu_vars = ('expansions', 'difficulty', 'start session', 'abort')
+building_menu_vars = ('expansions', 'difficulty', 'abort', 'start session')
 expansions = ('FRACTURES OF TIME', 'DOOMSDAY', 'PIONEERS OF NEW EARTH', 'GUARDIANS OF THE COUNCIL', 'clear')
 default_difficulty = ('easy', 'medium', 'hard')
 manual_difficulty = []

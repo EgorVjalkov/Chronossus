@@ -1,38 +1,35 @@
 import pandas as pd
 from random import shuffle
+from typing import Optional
+
+from chronossus.classes.chronology import Track, CommandTrack
+from chronossus.action_tile import ActionTile
 from consts_and_funcs import (path_to_project,
                               load_frame_from_file,
                               prepare_action_frame,
                               save_frame_to_file)
-<<<<<<< HEAD:chronossus/chronossus.py
-from chronossus.chronology import Chronology, CommandTrack
-from chronossus.action_tile import ActionTile
 
-=======
-from chronossus.classes.chronology import Chronology, CommandTrack
->>>>>>> refs/remotes/origin/main:chronossus/classes/chronossus.py
 
 pd.set_option('display.max.columns', None)
 
 
 class Chronossus:
     def __init__(self,
-                 base_game: str = 'ORIGINAL',
-                 expansions: str = 'NO EXPANSIONS',
+                 expansions: list | str = 'NO EXPANSIONS',
                  difficulty: str = 'easy',
                  language: str = 'eng'):
 
-        self.base_game = base_game
         self.expansions = expansions
         self.difficulty = difficulty
         self.language = language
 
-        self.action_board = None
-        self.chronology_deck = None
-        self.objectives = None
+        self.objectives: Optional[pd.DataFrame] = None
+        self.action_board: Optional[pd.DataFrame] = None # <- не фрейм а дисt???
+        self.chronology_track: Optional[Track] = None
+        self.time_travel_track: Optional[Track] = None
 
     def __repr__(self):
-        return f"Chronossus build: {self.base_game}, {self.expansions}, {self.difficulty}"
+        return f"Chronossus build: {self.expansions}, {self.difficulty}"
 
     def load_sheet_and_filter_by_game_build(self,
                                             sheet_name: str) -> pd.DataFrame:
@@ -40,8 +37,9 @@ class Chronossus:
             sheet_name,
             path_to_project)
 
-        f_by_edition = sheet[sheet.game_build == self.base_game]
-        return f_by_edition
+        f_by_game_build = sheet.game_build.map(lambda i: pd.isna(i) or i in self.expansions)
+        sheet = sheet[f_by_game_build == True]
+        return sheet
 
     def init_objectives(self):
         obj_frame = self.load_sheet_and_filter_by_game_build('objectives')
@@ -93,23 +91,44 @@ class Chronossus:
         self.action_board = pd.concat(action_frames, axis=0)
         return self
 
-    def init_chronology(self):
+    def init_time_travel_track(self) -> Track:
+        time_travel = load_frame_from_file(
+            'tracks',
+            path_to_project,
+            index_col=0)
+
+        self.time_travel_track = Track('time_travel', time_travel.loc['VP'], 0)
+        return self.time_travel_track
+
+    def init_chronology_track(self):
         chronology_frame = load_frame_from_file(
             'chronology',
             path_to_project,
             index_col=0)
 
-        chronology = Chronology(chronology_name='chronology',
-                                stages=chronology_frame.columns.to_list())
-        self.chronology_deck = chronology.prapare_for_saving(chronology_frame)
+        # chronology = Chronology(chronology_name='chronology',
+        #                         stages=chronology_frame.columns.to_list())
+        # self.chronology_deck = chronology.prapare_for_saving(chronology_frame)
+        # print(self.chronology_deck)
+        self.chronology_track = Track('chronology', chronology_frame.loc['IMPACT'])
+        return self.chronology_track
 
-        return self.chronology_deck
+    def init_tracks(self) -> object:
+        self.init_chronology_track()
+        self.init_time_travel_track()
+        return self
 
-    def save_chronossus_data(self):
+    def save_chronossus_data(self) -> None:
         all_data = {'objectives': self.objectives,
                     'action_deck': self.action_board,
-                    'chronology': self.chronology_deck}
+                    'chronology': self.chronology_track}
         for sheet_name in all_data:
             save_frame_to_file(all_data[sheet_name], sheet_name)
 
+    def game_start(self) -> object:
+        self.init_objectives()
+        self.place_action_tiles()
+        self.init_action_board()
+        self.init_tracks()
+        return self
 

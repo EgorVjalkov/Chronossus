@@ -1,11 +1,7 @@
 from chronossus.classes.chronossus import Chronossus
 
-chron = Chronossus()
-chron.init_objectives()
-chron.place_action_tiles()
-chron.init_action_board()
-chron.init_chronology()
-chron.save_chronossus_data()
+chron = Chronossus(expansions=['PIONEERS OF NEW EARTH'])
+chron.game_start()
 
     #ap.set_stage(1)
     #for i in range(6):

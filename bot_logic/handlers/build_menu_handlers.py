@@ -57,9 +57,9 @@ async def init_chronossus(message: Message, state: FSMContext) -> None:
     game_build = await state.get_data()
     game_build = {i.replace(' ', '_'): game_build[i] for i in game_build}
     print('build', game_build)
-    chron = Chronossus(**game_build)
-    print(chron)
+    chron = Chronossus(**game_build).game_start()
     await state.set_state(BuildGame.game)
+    await state.update_data({'Chronossus': chron})
 
 
 game_building_router = Router()

@@ -14,6 +14,10 @@ class BuildGame(StatesGroup):
 
 
 class ChronossusCommand(StatesGroup):
-    new_era_starting = State()
-    choosing_first_player = State()
-    applying_bot_command = State()
+    def __init__(self, num_of_EXOs):
+        self.num_of_EXOs = num_of_EXOs
+
+        choosing_first_player = State()
+        applying_bot_command = State()
+
+

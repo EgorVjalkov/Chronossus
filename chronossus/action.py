@@ -32,7 +32,7 @@ class Action:
 
 core_pool = ComplexStorage('powercore',
                            {'ch': 5, 'ex': 5},
-                           [0, 20])
+                           0)
 
 act = 'gains a powercore'
 
