@@ -13,11 +13,15 @@ class BuildGame(StatesGroup):
     game = State()
 
 
-class ChronossusCommand(StatesGroup):
-    def __init__(self, num_of_EXOs):
-        self.num_of_EXOs = num_of_EXOs
+class Era(StatesGroup):
+    preparation_phase = State()
+    paradox_phase = State()
+    power_up_phase = State()
+    warp_phase = State()
+    action_rounds_phase = State()
+    clean_up_phase = State()
 
-        choosing_first_player = State()
-        applying_bot_command = State()
+
+
 
 

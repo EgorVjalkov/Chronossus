@@ -39,24 +39,25 @@ class Chronology(TokenStorage):
         return frame_
 
 
-chronology_line = Chronology('chronology',
-                             [1, 2, 3, 4, 5, 6])
-
-
 class Track(Chronology):
     def __init__(self,
                  track_name: str,
-                 stage_data: pd.Series,
+                 stage_data: pd.Series | pd.DataFrame,
                  stage: int = 1):
 
+        if isinstance(stage_data, pd.DataFrame):
+            stages = stage_data.columns.to_list()
+        else:
+            stages = stage_data.index.to_list()
+
         super().__init__(chronology_name=track_name,
-                         stages=stage_data.index.to_list(),
+                         stages=stages,
                          stage=stage)
 
         self.stages_data = stage_data
 
     @property
-    def data(self) -> str:
+    def data(self) -> str | pd.Series:
         return self.stage_data(self.stages_data)
 
     def prapare_for_saving(self, **kwargs):

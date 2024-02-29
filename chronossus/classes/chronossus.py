@@ -110,7 +110,9 @@ class Chronossus:
         #                         stages=chronology_frame.columns.to_list())
         # self.chronology_deck = chronology.prapare_for_saving(chronology_frame)
         # print(self.chronology_deck)
-        self.chronology_track = Track('chronology', chronology_frame.loc['IMPACT'])
+        print(chronology_frame)
+        self.chronology_track = Track('chronology', chronology_frame.loc['IMPACT':'Exosuit_limit'])
+        print(self.chronology_track.stages_data)
         return self.chronology_track
 
     def init_tracks(self) -> object:
