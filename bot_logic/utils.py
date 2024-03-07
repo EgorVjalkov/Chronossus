@@ -1,7 +1,7 @@
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from typing import Any
-from bot_logic.handlers.available_variants import non_build_combos
+from bot_logic.main_handlers.available_variants import non_build_combos
 
 
 def combo_is_build(list_of_exps, new_exp) -> bool:
@@ -51,4 +51,5 @@ async def get_show_data(state: FSMContext) -> str:
                     show_data.append(
                         f"{k} -> {data[k]}")
         return '\n'.join(show_data)
+
 

@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.filters.callback_data import CallbackData
 
-from bot_logic.handlers.available_variants import GameBuildCategory
+from bot_logic.main_handlers.available_variants import GameBuildCategory
 from bot_logic.keyboards.row_len_analyzer import RowLenAnalyzer
 
 

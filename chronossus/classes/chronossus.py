@@ -1,8 +1,8 @@
 import pandas as pd
 from random import shuffle
-from typing import Optional
+from typing import Optional, Any
 
-from chronossus.classes.chronology import Track, CommandTrack
+from chronossus.classes.chronology import Track, CycledTrack
 from chronossus.action_tile import ActionTile
 from consts_and_funcs import (path_to_project,
                               load_frame_from_file,
@@ -86,7 +86,7 @@ class Chronossus:
         action_frames = []
         for marker in self.action_board.index:
             action_frame = prepare_action_frame(self.action_board, marker)
-            ap = CommandTrack(str(marker), action_frame.loc[marker])
+            ap = CycledTrack(str(marker), action_frame.loc[marker])
             action_frames.append(ap.prapare_for_saving())
         self.action_board = pd.concat(action_frames, axis=0)
         return self
@@ -106,14 +106,12 @@ class Chronossus:
             path_to_project,
             index_col=0)
 
-        # chronology = Chronology(chronology_name='chronology',
-        #                         stages=chronology_frame.columns.to_list())
-        # self.chronology_deck = chronology.prapare_for_saving(chronology_frame)
-        # print(self.chronology_deck)
-        print(chronology_frame)
-        self.chronology_track = Track('chronology', chronology_frame.loc['IMPACT':'Exosuit_limit'])
-        print(self.chronology_track.stages_data)
+        self.chronology_track = Track('chronology', chronology_frame.loc['name':'Exosuit_limit'])
+        print(self.chronology_track)
         return self.chronology_track
+
+    def get_era_name(self) -> Any:
+        return self.chronology_track.data['name']
 
     def init_tracks(self) -> object:
         self.init_chronology_track()

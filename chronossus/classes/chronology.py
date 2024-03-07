@@ -65,10 +65,10 @@ class Track(Chronology):
         return frame_.T
 
 
-class CommandTrack(Track):
+class CycledTrack(Track):
     def __init__(self,
                  track_name: str,
-                 stage_data: pd.Series,
+                 stage_data: pd.Series | pd.DataFrame,
                  stage: int = 1):
 
         super().__init__(track_name,

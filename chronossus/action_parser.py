@@ -1,5 +1,4 @@
 import pandas as pd
-
 from consts_and_funcs import load_frame_from_file
 
 

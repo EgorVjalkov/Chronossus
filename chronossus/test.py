@@ -1,4 +1,4 @@
-from chronossus.classes.chronology import CommandTrack
+from chronossus.classes.chronology import CycledTrack
 import pandas as pd
 
 
@@ -44,9 +44,9 @@ import pandas as pd
 #print(a.prapare_for_saving())
 #
 
-a = CommandTrack('1',
-                 pd.Series({1: 'x', 2: 'y'}, name='action'),
-                 stage=2)
+a = CycledTrack('1',
+                pd.Series({1: 'x', 2: 'y'}, name='action'),
+                stage=2)
 
 print(a)
 a.go_for_(-2)
